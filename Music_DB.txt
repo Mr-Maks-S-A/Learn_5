@@ -1,0 +1,31 @@
+-- 0. Сначала создаем родительскую таблицу genre (если её еще нет)
+CREATE TABLE IF NOT EXISTS genre (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
+-- 1. Затем таблицу исполнителей (она ссылается на genre)
+CREATE TABLE IF NOT EXISTS artist (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    genre_id INT NOT NULL,
+    CONSTRAINT fk_artist_genre FOREIGN KEY (genre_id) REFERENCES genre(id) ON DELETE CASCADE
+);
+
+-- 2. Затем таблицу альбомов (она ссылается на artist)
+CREATE TABLE IF NOT EXISTS album (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    release_year INT NOT NULL,
+    artist_id INT NOT NULL,
+    CONSTRAINT fk_album_artist FOREIGN KEY (artist_id) REFERENCES artist(id) ON DELETE CASCADE
+);
+
+-- 3. И в конце таблицу треков (она ссылается на album)
+CREATE TABLE IF NOT EXISTS track (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    duration INTERVAL NOT NULL,
+    album_id INT NOT NULL,
+    CONSTRAINT fk_track_album FOREIGN KEY (album_id) REFERENCES album(id) ON DELETE CASCADE
+);
