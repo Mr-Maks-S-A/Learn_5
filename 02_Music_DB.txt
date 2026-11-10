@@ -1,0 +1,61 @@
+-- 1. Таблица жанров
+CREATE TABLE IF NOT EXISTS genre (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE
+);
+
+-- 2. Таблица исполнителей
+CREATE TABLE IF NOT EXISTS artist (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL
+);
+
+-- Промежуточная таблица: связь многие-к-многим между исполнителями и жанрами
+CREATE TABLE IF NOT EXISTS artist_genre (
+    artist_id INT NOT NULL,
+    genre_id INT NOT NULL,
+    CONSTRAINT pk_artist_genre PRIMARY KEY (artist_id, genre_id),
+    CONSTRAINT fk_ag_artist FOREIGN KEY (artist_id) REFERENCES artist(id) ON DELETE CASCADE,
+    CONSTRAINT fk_ag_genre FOREIGN KEY (genre_id) REFERENCES genre(id) ON DELETE CASCADE
+);
+
+-- 3. Таблица альбомов
+CREATE TABLE IF NOT EXISTS album (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    release_year INT NOT NULL
+);
+
+-- Промежуточная таблица: связь многие-к-многим между исполнителями и альбомами (коллаборации)
+CREATE TABLE IF NOT EXISTS artist_album (
+    artist_id INT NOT NULL,
+    album_id INT NOT NULL,
+    CONSTRAINT pk_artist_album PRIMARY KEY (artist_id, album_id),
+    CONSTRAINT fk_aa_artist FOREIGN KEY (artist_id) REFERENCES artist(id) ON DELETE CASCADE,
+    CONSTRAINT fk_aa_album FOREIGN KEY (album_id) REFERENCES album(id) ON DELETE CASCADE
+);
+
+-- 4. Таблица треков (трек строго принадлежит одному альбому)
+CREATE TABLE IF NOT EXISTS track (
+    idSERIAL PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    duration INTERVAL NOT NULL,
+    album_id INT NOT NULL,
+    CONSTRAINT fk_track_album FOREIGN KEY (album_id) REFERENCES album(id) ON DELETE CASCADE
+);
+
+-- 5. Таблица сборников
+CREATE TABLE IF NOT EXISTS compilation (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    release_year INT NOT NULL
+);
+
+-- Промежуточная таблица: связь многие-к-многим между треками и сборниками
+CREATE TABLE IF NOT EXISTS track_compilation (
+    track_id INT NOT NULL,
+    compilation_id INT NOT NULL,
+    CONSTRAINT pk_track_compilation PRIMARY KEY (track_id, compilation_id),
+    CONSTRAINT fk_tc_track FOREIGN KEY (track_id) REFERENCES track(id) ON DELETE CASCADE,
+    CONSTRAINT fk_tc_compilation FOREIGN KEY (compilation_id) REFERENCES compilation(id) ON DELETE CASCADE
+);
